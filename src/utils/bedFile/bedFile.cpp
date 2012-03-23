@@ -671,3 +671,396 @@ void BedFile::loadBedFileIntoMapNoBin() {
         sort(m->second.begin(), m->second.end(), sortByStart);
     }
 }
+
+/*
+  reportBedTab
+
+  Writes the _original_ BED entry with a TAB
+  at the end of the line.
+  Works for BED3 - BED6.
+*/
+
+template <typename T>
+inline void BedFile::reportBedTab(const T &bed) {
+    // if it is azeroLength feature, we need to
+    // correct the start and end coords to what they were
+    // in the original file
+    CHRPOS start = bed.start;
+    CHRPOS end   = bed.end;
+    if (bed.zeroLength) {
+        if (_isGff == false)
+            start++;
+        end--;
+    }
+        
+    if (_isSql) {static_cast< SqlFile* >(this)->SqlReportBed(bed,start,end,"\t");return;}
+    // BED
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
+        }
+        else if (this->bedType == 4) {
+            printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str());
+        }
+        else if (this->bedType == 5) {
+            printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str());
+        }
+        else if (this->bedType == 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+        }
+        else if (this->bedType > 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+            vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+            vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+            for ( ; othIt != othEnd; ++othIt) {
+                printf("%s\t", bed.fields[*othIt].c_str());
+            }
+        }
+    }
+    // VCF
+    else if (_isGff == false && _isVcf == true) {
+        printf ("%s\t%d\t", bed.chrom.c_str(), start+1);
+
+        vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+        for ( ; othIt != othEnd; ++othIt) {
+            printf("%s\t", bed.fields[*othIt].c_str());
+        }
+    }
+    // GFF
+    else if (_isGff == true) {
+        // "GFF-8"
+        if (this->bedType == 8) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str());
+        }
+        // "GFF-9"
+        else if (this->bedType == 9) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str(), 
+                    bed.fields[bed.other_idxs[2]].c_str());
+        }
+    }
+}
+
+
+
+/*
+  reportBedNewLine
+
+  Writes the _original_ BED entry with a NEWLINE
+  at the end of the line.
+  Works for BED3 - BED6.
+*/
+template <typename T>
+inline void BedFile::reportBedNewLine(const T &bed) {
+        
+    // if it is azeroLength feature, we need to
+    // correct the start and end coords to what they were
+    // in the original file
+    CHRPOS start = bed.start;
+    CHRPOS end   = bed.end;
+    if (bed.zeroLength) {
+        if (_isGff == false)
+            start++;
+        end--;
+    }
+        
+    if (_isSql) {static_cast< SqlFile* >(this)->SqlReportBed(bed,start,end,"\n");return;}
+    //BED
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
+        }
+        else if (this->bedType == 4) {
+            printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str());
+        }
+        else if (this->bedType == 5) {
+            printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str());
+        }
+        else if (this->bedType == 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+        }
+        else if (this->bedType > 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+
+            vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+            vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+            for ( ; othIt != othEnd; ++othIt) {
+                printf("\t%s", bed.fields[*othIt].c_str());
+            }
+            printf("\n");
+        }
+    }
+    // VCF
+    else if (_isGff == false && _isVcf == true) {
+        printf ("%s\t%d", bed.chrom.c_str(), start+1);
+
+        vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+        for ( ; othIt != othEnd; ++othIt) {
+            printf("\t%s", bed.fields[*othIt].c_str());
+        }
+        printf("\n");
+    }
+    // GFF
+    else if (_isGff == true) {
+        // "GFF-8"
+        if (this->bedType == 8) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str());
+        }
+        // "GFF-9"
+        else if (this->bedType == 9) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str(), 
+                    bed.fields[bed.other_idxs[2]].c_str());
+        }
+    }
+}
+
+
+
+/*
+  reportBedRangeNewLine
+
+  Writes a custom start->end for a BED entry
+  with a NEWLINE at the end of the line.
+
+  Works for BED3 - BED6.
+*/
+template <typename T>
+inline void BedFile::reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
+    // if it is azeroLength feature, we need to
+    // correct the start and end coords to what they were
+    // in the original file
+    if (bed.zeroLength) {
+        start = bed.start + 1;
+        end   = bed.end - 1;
+    }
+
+    if (_isSql) {static_cast< SqlFile* >(this)->SqlReportBed(bed,start,end,"\t");return;}
+    // BED
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
+        }
+        else if (this->bedType == 4) {
+            printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str());
+        }
+        else if (this->bedType == 5) {
+            printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str());
+        }
+        else if (this->bedType == 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+        }
+        else if (this->bedType > 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+            vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+            vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+            for ( ; othIt != othEnd; ++othIt) {
+                printf("%s\t", bed.fields[*othIt].c_str());
+            }
+        }
+    }
+    // VCF
+    else if (_isGff == false && _isVcf == true) {
+        printf ("%s\t%d\t", bed.chrom.c_str(), bed.start+1);
+        vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+        for ( ; othIt != othEnd; ++othIt) {
+            printf("%s\t", bed.fields[*othIt].c_str());
+        }
+    }
+    // GFF
+    else if (_isGff == true) {
+        // "GFF-8"
+        if (this->bedType == 8) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str());
+        }
+        // "GFF-9"
+        else if (this->bedType == 9) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str(), 
+                    bed.fields[bed.other_idxs[2]].c_str());
+        }
+    }
+}
+
+
+
+/*
+  reportBedRangeTab
+
+  Writes a custom start->end for a BED entry
+  with a TAB at the end of the line.
+
+  Works for BED3 - BED6.
+*/
+template <typename T>
+inline void BedFile::reportBedRangeNewLine(const T &bed, CHRPOS start, CHRPOS end) {
+        
+    // if it is azeroLength feature, we need to
+    // correct the start and end coords to what they were
+    // in the original file
+    if (bed.zeroLength) {
+        start = bed.start + 1;
+        end   = bed.end - 1;
+    }
+
+    if (_isSql) {static_cast< SqlFile* >(this)->SqlReportBed(bed,start,end,"\n");return;}
+    // BED
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
+        }
+        else if (this->bedType == 4) {
+            printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str());
+        }
+        else if (this->bedType == 5) {
+            printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str());
+        }
+        else if (this->bedType == 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+        }
+        else if (this->bedType > 6) {
+            printf ("%s\t%d\t%d\t%s\t%s\t%s", bed.chrom.c_str(), start, end, bed.name.c_str(),
+                    bed.score.c_str(), bed.strand.c_str());
+
+            vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+            vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+            for ( ; othIt != othEnd; ++othIt) {
+                printf("\t%s", bed.fields[*othIt].c_str());
+            }
+            printf("\n");
+        }
+    }
+    // VCF
+    else if (_isGff == false && _isVcf == true) {
+        printf ("%s\t%d", bed.chrom.c_str(), bed.start+1);
+        vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
+        for ( ; othIt != othEnd; ++othIt) {
+            printf("\t%s", bed.fields[*othIt].c_str());
+        }
+        printf("\n");
+    }
+    // GFF
+    else if (_isGff == true) {
+        // "GFF-8"
+        if (this->bedType == 8) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str());
+        }
+        // "GFF-9"
+        else if (this->bedType == 9) {
+            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
+                    bed.name.c_str(), start+1, end,
+                    bed.score.c_str(), bed.strand.c_str(),
+                    bed.fields[bed.other_idxs[1]].c_str(), 
+                    bed.fields[bed.other_idxs[2]].c_str());
+        }
+    }
+}
+
+
+/*
+  reportNullBedTab
+*/
+void BedFile::reportNullBedTab() {
+
+    if (_isSql) {static_cast< SqlFile* >(this)->SqlReportBed(BED(),(CHRPOS)-1,(CHRPOS)-1,"\t");return;}
+
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf (".\t-1\t-1\t");
+        }
+        else if (this->bedType == 4) {
+            printf (".\t-1\t-1\t.\t");
+        }
+        else if (this->bedType == 5) {
+            printf (".\t-1\t-1\t.\t-1\t");
+        }
+        else if (this->bedType == 6) {
+            printf (".\t-1\t-1\t.\t-1\t.\t");
+        }
+        else if (this->bedType > 6) {
+            printf (".\t-1\t-1\t.\t-1\t.\t");
+            for (unsigned int i = 6; i < this->bedType; ++i) {
+                printf(".\t");
+            }
+        }
+    }
+    else if (_isGff == true && _isVcf == false) {
+        if (this->bedType == 8) {
+            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t");
+        }
+        else if (this->bedType == 9) {
+            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\t");
+        }
+    }
+}
+
+
+/*
+  reportNullBedTab
+*/
+void BedFile::reportNullBedNewLine() {
+
+    if (_isGff == false && _isVcf == false) {
+        if (this->bedType == 3) {
+            printf (".\t-1\t-1\n");
+        }
+        else if (this->bedType == 4) {
+            printf (".\t-1\t-1\t.\n");
+        }
+        else if (this->bedType == 5) {
+            printf (".\t-1\t-1\t.\t-1\n");
+        }
+        else if (this->bedType == 6) {
+            printf (".\t-1\t-1\t.\t-1\t.\n");
+        }
+        else if (this->bedType > 6) {
+            printf (".\t-1\t-1\t.\t-1\t.");
+            for (unsigned int i = 6; i < this->bedType; ++i) {
+                printf("\t.");
+            }
+            printf("\n");
+        }
+    }
+    else if (_isGff == true && _isVcf == false) {
+        if (this->bedType == 8) {
+            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\n");
+        }
+        else if (this->bedType == 9) {
+            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\n");
+        }
+    }
+}
+

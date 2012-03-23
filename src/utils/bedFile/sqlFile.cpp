@@ -45,3 +45,4 @@ bool SqlFile::GetNextBed(BED &bed, bool forceSorted) {
     return false;
 }
 
+
