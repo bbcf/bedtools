@@ -34,5 +34,6 @@ using namespace std;
 string string_error(int errnum);
 bool isRegularFile(const string& filename);
 bool isGzipFile(istream *file);
+bool isSqliteFile(istream *file);
 
 #endif /* FILETYPE_H */

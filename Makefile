@@ -20,7 +20,7 @@ export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSE
 else
 export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC
 endif
-export LIBS		= -lz
+export LIBS		= -lz  -lsqlite3
 export BT_ROOT  = src/utils/BamTools/
 
 

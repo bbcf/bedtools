@@ -10,7 +10,8 @@ aaronquinlan@gmail.com
 Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 
-#include "fileType.h"
+#include "fileType.h" 
+#include <string.h>
 
 
 /*
@@ -69,3 +70,12 @@ bool isGzipFile(istream *file) {
     file->putback(gzip_header.id1);
     return false;
 }
+
+bool isSqliteFile(istream *file) {    
+    char header[6];
+    file->read(header, 6);
+    if (strcmp(header,"SQLite")==0) return true;
+    file->seekg(0, ios::beg);
+    return false;
+}
+

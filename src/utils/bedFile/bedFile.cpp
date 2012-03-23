@@ -10,7 +10,7 @@
   Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "bedFile.h"
-
+#include "sqlFile.h"
 
 /***********************************************
 Sorting comparison functions
@@ -74,6 +74,7 @@ BedFile::BedFile(string &bedFile)
 : bedFile(bedFile),
   _isGff(false),
   _isVcf(false),
+  _isSql(false),
   _typeIsKnown(false),
   _merged_start(-1),
   _merged_end(-1),
@@ -96,7 +97,13 @@ void BedFile::Open(void) {
     }
     else {
         _bedStream = new ifstream(bedFile.c_str(), ios::in);
-        
+        if ( isSqliteFile(_bedStream) ) {
+            _isSql = true;
+            _typeIsKnown = true;
+            delete _bedStream;
+            static_cast< SqlFile* >(this)->Open();
+            return;
+        }
         if( isGzipFile(_bedStream) ) {
             delete _bedStream;
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
@@ -127,7 +134,7 @@ bool BedFile::Empty(void) {
 
 // Close the BED file
 void BedFile::Close(void) {
-    if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
+    if (bedFile != "stdin" && bedFile != "-" && !_isSql) delete _bedStream;
 }
 
 void BedFile::GetLine(void) {
@@ -172,6 +179,8 @@ void BedFile::PrintHeader(void) {
 
 bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
 
+    if (_isSql) 
+        return static_cast< SqlFile* >(this)->GetNextBed(bed,forceSorted);
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
     _bedFields.clear();
@@ -561,6 +570,8 @@ void BedFile::countListHits(const BED &a, int index, bool sameStrand, bool diffS
 void BedFile::setZeroBased(bool zeroBased) { this->isZeroBased = zeroBased; }
 
 void BedFile::setGff (bool gff) { this->_isGff = gff; }
+
+void BedFile::setSql (bool sql) { this->_isSql = sql; }
 
 void BedFile::setVcf (bool vcf) { this->_isVcf = vcf; }
 

@@ -467,11 +467,12 @@ public:
     
     BedLineStatus _status;
     int _lineNum;
-private:
+protected:
 
     // data
     bool _isGff;
     bool _isVcf;
+    bool _isSql;
     bool _typeIsKnown;        // do we know the type?   (i.e., BED, GFF, VCF)
     FileType   _fileType;     // what is the file type? (BED? GFF? VCF?)
     istream   *_bedStream;
@@ -490,6 +491,7 @@ private:
     void setZeroBased(bool zeroBased);
     void setGff (bool isGff);
     void setVcf (bool isVcf);
+    void setSql (bool isSql);
     void setFileType (FileType type);
     void setBedType (int colNums);
     void setBed12 (bool isBed12);
@@ -796,6 +798,16 @@ public:
         at the end of the line.
         Works for BED3 - BED6.
     */
+
+    template <typename T> inline void SqlReportBed(const T &bed, CHRPOS start=-1, CHRPOS end=-1, const char* finalize="\n") {
+        /****   TODO: fields business ****/
+        if (start<0) start = bed.start;
+        if (end<0) end = bed.end;
+        printf ("%s\t%d\t%d\t%s\t%s%s", 
+                bed.chrom.c_str(), start, end, bed.name.c_str(),
+                bed.score.c_str(), finalize);
+    }
+
     template <typename T>
     inline void reportBedTab(const T &bed) {
         // if it is azeroLength feature, we need to
@@ -809,6 +821,7 @@ public:
             end--;
         }
         
+        if (_isSql) {SqlReportBed(bed,start,end,"\t");return;}
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -887,6 +900,8 @@ public:
                 start++;
             end--;
         }
+        
+        if (_isSql) {SqlReportBed(bed,start,end,"\n");return;}
         //BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -965,6 +980,8 @@ public:
             start = bed.start + 1;
             end   = bed.end - 1;
         }
+
+        if (_isSql) {SqlReportBed(bed,start,end,"\t");return;}
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -1040,6 +1057,8 @@ public:
             start = bed.start + 1;
             end   = bed.end - 1;
         }
+
+        if (_isSql) {SqlReportBed(bed,start,end,"\n");return;}
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -1103,6 +1122,8 @@ public:
         reportNullBedTab
     */
     void reportNullBedTab() {
+
+        if (_isSql) {SqlReportBed(BED(),(CHRPOS)-1,(CHRPOS)-1,"\t");return;}
 
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {

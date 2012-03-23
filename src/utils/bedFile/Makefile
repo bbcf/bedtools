@@ -12,11 +12,13 @@ INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= bedFile.cpp bedFile.h
+SOURCES= sqlFile.cpp sqlFile.h bedFile.cpp bedFile.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
+
+all: $(BUILT_OBJECTS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
