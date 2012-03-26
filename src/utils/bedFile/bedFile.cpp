@@ -134,7 +134,8 @@ bool BedFile::Empty(void) {
 
 // Close the BED file
 void BedFile::Close(void) {
-    if (bedFile != "stdin" && bedFile != "-" && !_isSql) delete _bedStream;
+    if (_isSql) static_cast< SqlFile* >(this)->Close();
+    else if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
 }
 
 void BedFile::GetLine(void) {
