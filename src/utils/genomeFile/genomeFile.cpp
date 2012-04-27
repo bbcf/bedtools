@@ -10,7 +10,9 @@
   Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "lineFileUtilities.h"
+#include "fileType.h"
 #include "genomeFile.h"
+#include "sqlGenome.h"
 
 
 GenomeFile::GenomeFile(const string &genomeFile) {
@@ -41,6 +43,10 @@ void GenomeFile::loadGenomeFileIntoMap() {
 
     // open the GENOME file for reading
     ifstream genome(_genomeFile.c_str(), ios::in);
+    if ( isSqliteFile(&genome) ) {
+	static_cast< SqlGenome* >(this)->loadGenomeFileIntoMap();
+	return;
+    }
     if ( !genome ) {
         cerr << "Error: The requested genome file (" << _genomeFile << ") could not be opened. Exiting!" << endl;
         exit (1);

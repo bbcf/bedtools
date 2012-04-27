@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include <cstdio>
 
+#include <sqlite3.h> 
+
 using namespace std;
 
 //*************************************************
@@ -126,6 +128,11 @@ protected:
     bool _isSql;
     // data
     istream *_bedGraphStream;
+
+    sqlite3 *_db;
+    sqlite3_stmt *_stmt;
+    std::map< std::string, long > _chrom_table;
+    std::map< std::string, long >::const_iterator I_chrom;
 
     template <typename T> BedGraphLineStatus parseLine(BEDGRAPH<T>&, const vector<string>&, int&);
 };

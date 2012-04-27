@@ -31,6 +31,8 @@
 #include <stdint.h>
 #include <cstdio>
 //#include <tr1/unordered_map>  // Experimental.
+#include <sqlite3.h> 
+
 using namespace std;
 
 
@@ -487,6 +489,11 @@ protected:
     string _merged_chrom;
     int _prev_start;
     string _prev_chrom;
+
+    sqlite3 *_db;
+    sqlite3_stmt *_stmt;
+    std::map< std::string, long > _chrom_table;
+    std::map< std::string, long >::const_iterator I_chrom;
 
     void setZeroBased(bool zeroBased);
     void setGff (bool isGff);

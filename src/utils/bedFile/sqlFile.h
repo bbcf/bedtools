@@ -1,8 +1,6 @@
 #ifndef SQLFILE_H
 #define SQLFILE_H
 
-#include <sqlite3.h> 
-
 class SqlFile : public BedFile {
 
 public:
@@ -25,11 +23,6 @@ public:
     }
 
 private: 
-    sqlite3 *_db;
-    sqlite3_stmt *_stmt;
-    std::map< std::string, long > _chrom_table;
-    std::map< std::string, long >::const_iterator I_chrom;
-
     inline void prepareNextChrom( const std::string& );
 
 };

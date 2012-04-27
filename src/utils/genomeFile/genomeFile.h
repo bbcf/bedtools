@@ -58,7 +58,7 @@ public:
 
 
 
-private:
+protected:
     string  _genomeFile;
     chromToSizes _chromSizes;
     vector<string> _chromList;
