@@ -15,6 +15,7 @@
 // Constructor
 BedGraphFile::BedGraphFile(string &_file) :
     bedGraphFile(_file),
+    _isSql(false),
     _bedGraphStream(NULL)
 {}
 
@@ -33,6 +34,12 @@ void BedGraphFile::Open() {
     else {
         _bedGraphStream = new ifstream(bedGraphFile.c_str(), ios::in);
 
+        if ( isSqliteFile(_bedGraphStream) ) {
+            _isSql = true;
+            delete _bedGraphStream;
+            static_cast< SqlGraphFile* >(this)->Open();
+            return;
+        }
         if (isGzipFile(_bedGraphStream) == true) {
             delete _bedGraphStream;
             _bedGraphStream = new igzstream(bedGraphFile.c_str(), ios::in);
@@ -48,7 +55,8 @@ void BedGraphFile::Open() {
 
 // Close the BEDGRAPH file
 void BedGraphFile::Close() {
-    if (bedGraphFile != "stdin" && bedGraphFile != "-") {
+    if (_isSql) static_cast< SqlGraphFile* >(this)->Close();
+    else if (bedGraphFile != "stdin" && bedGraphFile != "-") {
         if (_bedGraphStream) {
             delete _bedGraphStream;
             _bedGraphStream = NULL ;
