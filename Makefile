@@ -59,7 +59,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/tagBam \
 		  $(SRC_DIR)/unionBedGraphs \
 		  $(SRC_DIR)/windowBed \
-		  $(SRC_DIR)/windowMaker
+		  $(SRC_DIR)/windowMaker\
+		  $(SRC_DIR)/toSql
 
 UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/version \
@@ -85,12 +86,11 @@ all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@$(CXX) $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o -I$(UTIL_DIR)/version/
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
 	@echo "done."
-	
 	@echo "- Creating executables for old CLI."
 	@python scripts/makeBashScripts.py
 	@chmod +x bin/*
 	@echo "done."
-	
+
 
 .PHONY: all
 

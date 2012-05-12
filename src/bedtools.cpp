@@ -70,6 +70,7 @@ int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
 int windowmaker_main(int argc, char* argv[]); //
+int tosql_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
@@ -131,6 +132,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
 
+    else if (sub_cmd == "tosql")      return tosql_main(argc-1, argv+1);
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
              sub_cmd == "-help")
@@ -231,6 +233,7 @@ int bedtools_help(void)
     cout  << "    makewindows   "  << "Make interval \"windows\" across a genome.\n";
     cout  << "    groupby       "  << "Group by common cols. & summarize oth. cols. (~ SQL \"groupBy\")\n";
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
+    cout  << "    tosql         "  << "Convert bed to sqlite format.\n";
 
     cout  << endl;
     cout  << "[ General help ]" << endl;
