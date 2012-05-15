@@ -27,7 +27,7 @@ all: $(BUILT_OBJECTS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
-	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(DFLAGS) $(INCLUDES)
+	@$(CXX) -std=c++0x -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(DFLAGS) $(INCLUDES)
 
 clean:
 	@echo "Cleaning up."
