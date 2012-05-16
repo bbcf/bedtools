@@ -11,14 +11,6 @@
 #include <stdio.h>
 #include <sstream>
 
-static const std::map< const std::string, std::string > _sql_types({
-        {"start", "INTEGER"},
-        {"end", "INTEGER"},
-        {"name", "TEXT"},
-        {"score", "REAL"},
-        {"strand", "INTEGER"}
-    });
-
 ToSql::ToSql( std::string bedFile, std::string genomeFile, std::string sqlFile,
 	      std::string all_fields, std::string datatype )
     : _last_chrom(), _bedFile(bedFile), _genomeFile(genomeFile), _sqlFile(sqlFile)
@@ -64,6 +56,13 @@ void ToSql::Close(void) {
 
 
 bool ToSql::prepareTables( const std::string &datatype ) {
+    static std::map< const std::string, std::string > _sql_types;
+    _sql_types["start"] = "INTEGER";
+    _sql_types["end"] = "INTEGER";
+    _sql_types["name"] = "TEXT";
+    _sql_types["score"] = "REAL";
+    _sql_types["strand"] = "INTEGER";
+
     std::stringstream sql_exec;
     const char *_dummy;
     sql_exec << "CREATE TABLE IF NOT EXISTS 'attributes' ('key' TEXT, 'value' TEXT)"; 
