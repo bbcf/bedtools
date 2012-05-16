@@ -44,7 +44,8 @@ def main():
                  'tag': 'tagBam', 
                  'unionbedg': 'unionBedGraphs', 
                  'window': 'windowBed',
-                 'makewindows': 'windowMaker'}
+                 'makewindows': 'windowMaker',
+                 'tosql': 'bedToSql'}
 
     # create a BASH script for each old tool, mapping to the new CLI command.
     for tool in tool_map:
