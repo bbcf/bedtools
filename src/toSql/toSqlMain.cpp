@@ -81,7 +81,7 @@ void tosql_help(void) {
 	      << "Options: \n"
 	      << "\t-g\tGenome file.\n\n"
 	      << "\t-o\tOutput sql file.\n\n"
-	      << "\t-f\tField names (comma.separated list).\n\n"
+	      << "\t-f\tField names (comma-separated list).\n\n"
 	      << "\t-t\tData type.\n\n";
     exit(1);
 }
