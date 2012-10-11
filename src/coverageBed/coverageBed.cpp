@@ -85,10 +85,12 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
     // that we can easily compare "A" to it for overlaps
     _bedB->loadBedCovFileIntoMap();
 
-    // open the BAM file
+    // open the BAM file		
     BamReader reader;
-    reader.Open(bamFile);
-
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
     // get header & reference information
     string header = reader.GetHeaderText();
     RefVector refs = reader.GetReferenceData();
@@ -102,13 +104,23 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
             if (_obeySplits == false) {
                 // construct a new BED entry from the current BAM alignment.
                 BED a;
-                a.chrom  = refs.at(bam.RefID).RefName;
-                a.start  = bam.Position;
-                a.end    = bam.GetEndPosition(false, false);
-                a.strand = "+";
-                if (bam.IsReverseStrand()) a.strand = "-";
+                
+                try 
+                {
+                    a.chrom  = refs.at(bam.RefID).RefName;
+                    a.start  = bam.Position;
+                    a.end    = bam.GetEndPosition(false, false);
+                    a.strand = "+";
+                    if (bam.IsReverseStrand()) a.strand = "-";
 
-                _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
+                    _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
+                }
+                catch (out_of_range& oor) 
+                {
+                  cerr << bam.Name 
+                       << " is said to be mapped (0x4 == false), yet the chrom is missing.  Skipping." 
+                       << endl;
+                }
             }
             // split the BAM alignment into discrete blocks and
             // look for overlaps only within each block.
@@ -117,10 +129,20 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 bedVector bedBlocks;
                 // since we are counting coverage, we do want to split blocks when a
                 // deletion (D) CIGAR op is encountered (hence the true for the last parm)
-                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, false, true);
-                // use countSplitHits to avoid over-counting each split chunk
-                // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
+                try 
+                {
+                    string chrom  = refs.at(bam.RefID).RefName;
+                    GetBamBlocks(bam, chrom, bedBlocks, false, true);
+                    // use countSplitHits to avoid over-counting each split chunk
+                    // as distinct read coverage.
+                    _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
+                }
+                catch (out_of_range& oor) 
+                {
+                  cerr << bam.Name 
+                       << " is said to be mapped (0x4 == false), yet the chrom is missing.  Skipping." 
+                       << endl;
+                }
             }
         }
     }

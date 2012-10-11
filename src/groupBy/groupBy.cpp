@@ -172,10 +172,10 @@ int groupby_main(int argc, char* argv[]) {
         // Split the column string sent by the user into discrete column numbers
         // A comma separated string is expected.
         vector<int> groupColumnsInt;
-        Tokenize(groupColumnsString, groupColumnsInt, ',');
+        TokenizeColumns(groupColumnsString, groupColumnsInt);
 
         vector<int> opColumnsInt;
-        Tokenize(opsColumnString, opColumnsInt, ',');
+        TokenizeColumns(opsColumnString, opColumnsInt);
 
         // sanity check the group columns
         for(size_t i = 0; i < groupColumnsInt.size(); ++i) {
@@ -323,7 +323,7 @@ void GroupBy (const string &inFile,
     TabFile *_tab = new TabFile(inFile);
     _tab->Open();
     while ((tabLineStatus = _tab->GetNextTabLine(inFields, lineNum)) != TAB_INVALID) {
-        if (tabLineStatus == TAB_VALID) {
+        if ((tabLineStatus == TAB_VALID) || (tabLineStatus == TAB_HEADER)) {
 
             if (first_line) {
                 first_line = false;
