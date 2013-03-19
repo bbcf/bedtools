@@ -17,7 +17,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # define our source and object files
 # ----------------------------------
 SOURCES= windowMain.cpp windowBed.cpp windowBed.h
-OBJECTS= windowMain.o windowBed.o 
+OBJECTS= windowMain.o windowBed.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 

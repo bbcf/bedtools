@@ -17,9 +17,9 @@ export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG 
+export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
 else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC 
+export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC
 endif
 export LIBS		= -lz  -lsqlite3
 export BT_ROOT  = src/utils/BamTools/
@@ -43,6 +43,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/groupBy \
 		  $(SRC_DIR)/intersectBed \
+		  $(SRC_DIR)/jaccard \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
 		  $(SRC_DIR)/mapBed \
@@ -53,6 +54,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
 		  $(SRC_DIR)/randomBed \
+		  $(SRC_DIR)/reldist \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
 		  $(SRC_DIR)/sortBed \
@@ -87,11 +89,12 @@ all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@$(CXX) $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o -I$(UTIL_DIR)/version/
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
 	@echo "done."
+	
 	@echo "- Creating executables for old CLI."
 	@python scripts/makeBashScripts.py
 	@chmod +x bin/*
 	@echo "done."
-
+	
 
 .PHONY: all
 

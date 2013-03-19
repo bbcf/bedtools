@@ -52,6 +52,7 @@ int genomecoverage_main(int argc, char* argv[]);//
 int getoverlap_main(int argc, char* argv[]);//
 int groupby_main(int argc, char* argv[]);//
 int intersect_main(int argc, char* argv[]); //
+int jaccard_main(int argc, char* argv[]); //
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
 int map_main(int argc, char* argv[]); //
@@ -62,6 +63,7 @@ int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
+int reldist_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
@@ -70,7 +72,6 @@ int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
 int windowmaker_main(int argc, char* argv[]); //
-int tosql_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
@@ -124,6 +125,10 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "maskfasta")   return maskfastafrombed_main(argc-1, argv+1);
     else if (sub_cmd == "nuc")         return nuc_main(argc-1, argv+1);
 
+    // statistics tools
+    else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
+    else if (sub_cmd == "reldist")     return reldist_main(argc-1, argv+1);
+
     // misc. tools
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
     else if (sub_cmd == "igv")         return bedtoigv_main(argc-1, argv+1);
@@ -132,7 +137,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
 
-    else if (sub_cmd == "tosql")      return tosql_main(argc-1, argv+1);
+    else if (sub_cmd == "tosql")       return tosql_main(argc-1, argv+1);
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
              sub_cmd == "-help")
@@ -224,6 +229,11 @@ int bedtools_help(void)
     cout  << "[ BAM focused tools ]" << endl;
     cout  << "    multicov      "  << "Counts coverage from multiple BAMs at specific intervals.\n";
     cout  << "    tag           "  << "Tag BAM alignments based on overlaps with interval files.\n";
+    
+    cout  << endl;
+    cout  << "[ Statistical relationships ]" << endl;
+    cout  << "    jaccard       "  << "Calculate the Jaccard statistic b/w two sets of intervals.\n";
+    cout  << "    reldist       "  << "Calculate the distribution of relative distances b/w two files.\n";
 
     cout  << endl;
     cout  << "[ Miscellaneous tools ]" << endl;

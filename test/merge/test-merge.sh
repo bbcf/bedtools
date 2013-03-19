@@ -1,4 +1,4 @@
-BT=../../bin/bedtools
+BT=${BT-../../bin/bedtools}
 
 check()
 {
@@ -36,6 +36,7 @@ rm obs exp
 #  Enforce coordinate sorted input.
 ###########################################################
 echo "    merge.t2...\c"
+command -v tac 2>/dev/null || alias tac="sed '1!G;h;\$!d'"
 tac a.bed | $BT merge -i - 2> obs
 echo "ERROR: input file: (-) is not sorted by chrom then start.
        The start coordinate at line 3 is less than the start at line 2" > exp
@@ -67,7 +68,7 @@ echo \
 *****
 *****ERROR: No names found to report for the -names option. Exiting.
 *****" > exp
-$BT merge -i a.bed -nms &> obs
+$BT merge -i a.bed -nms > obs 2>&1
 check obs exp
 rm obs exp
 
@@ -86,7 +87,7 @@ rm obs exp
 echo "    merge.t5...\c"
 echo \
 "chr1	10	20	a1
-chr1	30	100	a2;a3;a4" > exp
+chr1	30	100	a2,a3,a4" > exp
 $BT merge -i a.names.bed -nms > obs
 check obs exp
 rm obs exp
@@ -97,10 +98,10 @@ rm obs exp
 echo "    merge.t6...\c"
 echo \
 "chr1	10	20	a1	1
-chr1	30	100	a2;a3;a4	9
+chr1	30	100	a2,a3,a4	9
 chr2	10	20	a1	5
 chr2	30	40	a2	6
-chr2	42	100	a3;a4	15" > exp
+chr2	42	100	a3,a4	15" > exp
 $BT merge -i a.full.bed -nms -scores sum> obs
 check obs exp
 rm obs exp
@@ -125,10 +126,10 @@ rm obs exp
 echo "    merge.t8...\c"
 echo \
 "chr1	10	20	a1	1	1
-chr1	30	100	a2;a3;a4	9	3
+chr1	30	100	a2,a3,a4	9	3
 chr2	10	20	a1	5	1
 chr2	30	40	a2	6	1
-chr2	42	100	a3;a4	15	2" > exp
+chr2	42	100	a3,a4	15	2" > exp
 $BT merge -i a.full.bed -nms -n -scores sum> obs
 check obs exp
 rm obs exp
@@ -147,5 +148,23 @@ chr2	30	40	a2	6	+	1
 chr2	42	50	a3	7	+	1
 chr2	45	100	a4	8	-	1" > exp
 $BT merge -i a.full.bed -s -nms -n -scores sum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+# Test #10
+#  Test the use of a custom delimiter for -nms
+#  
+# cat a.names.bed
+# chr1	10	20	a1
+# chr1	30	40	a2
+# chr1	40	50	a3
+# chr1	45	100	a4
+###########################################################
+echo "    merge.t10...\c"
+echo \
+"chr1	10	20	a1
+chr1	30	100	a2|a3|a4" > exp
+$BT merge -i a.names.bed -nms -delim "|" > obs
 check obs exp
 rm obs exp

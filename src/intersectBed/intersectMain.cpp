@@ -255,7 +255,7 @@ void intersect_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
+    cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well. Replaces -a." << endl << endl;
 
     cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
@@ -264,7 +264,8 @@ void intersect_help(void) {
 
     cerr << "\t-wa\t"           << "Write the original entry in A for each overlap." << endl << endl;
 
-    cerr << "\t-wb\t"           << "Write the original entry in B for each overlap." << endl;
+    cerr << "\t-wb\t"           << "Follow the A entry with the original "
+                                << "entry in B for each overlap." << endl;
     cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
     
     cerr << "\t-loj\t"          << "Perform a \"left outer join\". That is, for each feature in A" << endl;

@@ -208,12 +208,12 @@ uint32_t VectorOps::GetCountDistinct(void)
     return _vecs.size();
 }
 
-string VectorOps::GetCollapse(void)
+string VectorOps::GetCollapse(string delimiter)
 {
     ostringstream collapse;
     for( size_t i = 0; i < _vecs.size(); i++ ) {
         if (i>0)
-            collapse << ",";
+            collapse << delimiter;
         collapse << _vecs[i];
     }
     return collapse.str();
@@ -313,3 +313,17 @@ string VectorOps::GetFreqAsc(void)
     
     return buffer.str();
 }
+
+
+string VectorOps::GetFirst(void)
+{
+    return _vecs[0];
+}
+
+
+string VectorOps::GetLast(void)
+{
+    return _vecs[_vecs.size() - 1];
+}
+
+
