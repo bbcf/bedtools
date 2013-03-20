@@ -72,6 +72,7 @@ int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
 int windowmaker_main(int argc, char* argv[]); //
+int tosql_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
