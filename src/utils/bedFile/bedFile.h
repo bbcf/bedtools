@@ -1017,8 +1017,8 @@ inline void BedFile::reportBedTab(const T &bed) {
   Works for BED3 - BED6.
 */
 template <typename T>
-inline void reportBedNewLine(const T &bed) {
-    
+inline void BedFile::reportBedNewLine(const T &bed) {
+        
     // if it is azeroLength feature, we need to
     // correct the start and end coords to what they were
     // in the original file
@@ -1106,7 +1106,7 @@ inline void reportBedNewLine(const T &bed) {
   Works for BED3 - BED6.
 */
 template <typename T>
-inline void reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
+inline void BedFile::reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
     // if it is azeroLength feature, we need to
     // correct the start and end coords to what they were
     // in the original file
@@ -1191,8 +1191,8 @@ inline void reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
   Works for BED3 - BED6.
 */
 template <typename T>
-inline void reportBedRangeNewLine(const T &bed, CHRPOS start, CHRPOS end) {
-    
+inline void BedFile::reportBedRangeNewLine(const T &bed, CHRPOS start, CHRPOS end) {
+        
     // if it is azeroLength feature, we need to
     // correct the start and end coords to what they were
     // in the original file
