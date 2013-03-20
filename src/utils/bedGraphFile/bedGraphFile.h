@@ -163,6 +163,9 @@ BedGraphLineStatus BedGraphFile::GetNextBedGraph (BEDGRAPH<T> &bedgraph, int &li
 
         // split into a string vector.
         Tokenize(bedGraphLine,bedGraphFields);
+        if (bedGraphLine[bedGraphLine.size()-1] == '\r') {
+            bedGraphLine.resize(bedGraphLine.size()-1);
+        }
 
         // load the BED struct as long as it's a valid BED entry.
         return parseLine(bedgraph, bedGraphFields, lineNum);
